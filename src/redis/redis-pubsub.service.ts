@@ -36,7 +36,7 @@ export class RedisPubSubService {
 
   public onEvent(eventName: string): Observable<any> {
     this.redisSubscriberClient.subscribe(eventName, () => {
-      Logger.log(`Subscribed on ${eventName} channel`, 'Sockedis');
+      Logger.log(`Subscribed on ${eventName} channel`, 'RedisPubSubService');
     });
 
     return new Observable((observer: Observer<RedisSubscribeMessage>) =>
