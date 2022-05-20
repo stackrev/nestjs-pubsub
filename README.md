@@ -35,16 +35,18 @@ $ yarn add nestjs-pubsub
 
 ### Getting Started
 
-> Import PubSubModule in the root module of the application. `app.module.ts`
+#### Redis Pub/Sub
+
+> Import **RedisPubSubModule** in the root module of the application. `app.module.ts`
 
 ```typescript
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { PubSubModule } from 'nestjs-pubsub';
+import { RedisPubSubModule } from 'nestjs-pubsub';
 
 @Module({
-  imports: [PubSubModule],
+  imports: [RedisPubSubModule],
   controllers: [AppController],
   providers: [AppService],
 })
@@ -53,21 +55,7 @@ export class AppModule {}
 
 &NewLine;
 
-> Your **RedisService**
-
-```typescript
-import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { RedisModule } from 'nestjs-pubsub';
-
-@Module({
-  imports: [RedisModule],
-  controllers: [AppController],
-  providers: [AppService],
-})
-export class AppModule {}
-```
+> Inject **RedisPubSubService** into `YourService.ts`\*\*`
 
 &NewLine;
 
@@ -79,9 +67,20 @@ import { RedisService } from 'nestjs-pubsub';
 export class YourService {
   constructor(private readonly redisService: RedisService) {
     this.redisService.onEvent('your_event_name').subscribe(({ message }) => {
-      console.log('income data as message', message); // message is a string data
-      // your data
+      console.log('income data as string', message);
+      // Parse your data if you need!
       // const data = JSON.parse(message)
+
+      // Your handler code here ...
+    });
+
+    // Or
+
+    this.redisService.fromEvent('your_event_name').subscribe((data) => {
+      // Data conversion is done in the fromEvent method
+      console.log('income data as object', data);
+
+      // Your handler code here ...
     });
   }
 
