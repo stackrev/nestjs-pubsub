@@ -3,6 +3,7 @@ import { filter, map } from 'rxjs/operators';
 
 import { Inject, Injectable, Logger } from '@nestjs/common';
 
+import { PubSubServiceInterface } from '../Contracts';
 import { REDIS_IO, REDIS_PUBLISHER_CLIENT, REDIS_SUBSCRIBER_CLIENT } from './';
 
 export interface RedisSubscribeMessage {
@@ -11,7 +12,7 @@ export interface RedisSubscribeMessage {
 }
 
 @Injectable()
-export class RedisPubSubService {
+export class RedisPubSubService implements PubSubServiceInterface {
   public constructor(
     @Inject(REDIS_SUBSCRIBER_CLIENT)
     private readonly redisSubscriberClient,
