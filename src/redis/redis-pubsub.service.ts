@@ -1,9 +1,10 @@
+import Redis from 'ioredis';
 import { Observable, Observer } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
 
 import { Inject, Injectable, Logger } from '@nestjs/common';
 
-import { PubSubServiceInterface } from '../Contracts';
+import { PubSubServiceInterface } from '../contracts';
 import { REDIS_IO, REDIS_PUBLISHER_CLIENT, REDIS_SUBSCRIBER_CLIENT } from './';
 
 export interface RedisSubscribeMessage {
@@ -15,11 +16,11 @@ export interface RedisSubscribeMessage {
 export class RedisPubSubService implements PubSubServiceInterface {
   public constructor(
     @Inject(REDIS_SUBSCRIBER_CLIENT)
-    private readonly redisSubscriberClient,
+    private readonly redisSubscriberClient: Redis,
     @Inject(REDIS_PUBLISHER_CLIENT)
-    private readonly redisPublisherClient,
+    private readonly redisPublisherClient: Redis,
     @Inject(REDIS_IO)
-    private readonly redisIo,
+    private readonly redisIo: Redis,
   ) {}
 
   public fromEvent(eventName: string): Observable<any> {

@@ -1,3 +1,5 @@
-export * from './module/pubsub.module';
+export * from './contracts';
 
 export * from './redis';
+
+export * from './kafka';

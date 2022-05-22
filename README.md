@@ -1,13 +1,14 @@
 ## Nest Sockedis
 
-> **`Nestjs`**, **`Publish`**, **`Subscribe`**, **`Redis`**
+> **`Nestjs`**, **`Publish`**, **`Subscribe`**, **`Redis`**, **`Kafka`**
 >
 > &NewLine;
 > A library for much **easier** implementation of **Publish/Subscribe** in the **NestJs** framework
 
 > ### implement operations with:
 >
-> - ✅ **redis**
+> - ✅ **Redis**
+> - ✅ **Kafka**
 
 ### Installation
 
@@ -21,21 +22,9 @@ $ yarn add nestjs-pubsub
 
 &NewLine;
 
-### Environment config
+## Getting Started
 
-> Configures required to start inside the **.env** file
-
-- REDIS_HOST=127.0.0.1
-- REDIS_PORT=6379
-- REDIS_USERNAME=username
-- REDIS_PASSWORD=password
-- REDIS_DATABASE=0
-
-&NewLine;
-
-### Getting Started
-
-#### Redis Pub/Sub
+> ## Redis Pub/Sub
 
 > Import **RedisPubSubModule** in the root module of the application. `app.module.ts`
 
@@ -46,7 +35,15 @@ import { AppService } from './app.service';
 import { RedisPubSubModule } from 'nestjs-pubsub';
 
 @Module({
-  imports: [RedisPubSubModule],
+  imports: [
+    RedisPubSubModule.register({
+      host: process.env.REDIS_HOST || '127.0.0.1',
+      port: +process.env.REDIS_PORT || 6379,
+      username: process.env.REDIS_USERNAME || 'default',
+      password: process.env.REDIS_PASSWORD,
+      db: +process.env.REDIS_DATABASE || 0,
+    }),
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
@@ -55,7 +52,7 @@ export class AppModule {}
 
 &NewLine;
 
-> Inject **RedisPubSubService** into `YourService.ts`\*\*`
+> Inject **RedisPubSubService** into `your.service.ts`
 
 &NewLine;
 
@@ -70,15 +67,6 @@ export class YourService {
       console.log('income data as string', message);
       // Parse your data if you need!
       // const data = JSON.parse(message)
-
-      // Your handler code here ...
-    });
-
-    // Or
-
-    this.redisService.fromEvent('your_event_name').subscribe((data) => {
-      // Data conversion is done in the fromEvent method
-      console.log('income data as object', data);
 
       // Your handler code here ...
     });
@@ -103,6 +91,60 @@ export class YourService {
 
   async hashGet(key: string) {
     return await this.redisService.hashGet(key);
+  }
+}
+```
+
+&NewLine;
+
+> ## Kafka Pub/Sub
+
+> Import **KafkaPubSubModule** in the root module of the application. `app.module.ts`
+
+```typescript
+import { Module } from '@nestjs/common';
+import { AppController } from './app.controller';
+import { AppService } from './app.service';
+import { KafkaPubSubModule } from 'nestjs-pubsub';
+
+@Module({
+  imports: [
+    KafkaPubSubModule.register({
+      clientId: 'my-app',
+      brokers: ['kafka1:9092', 'kafka2:9092'],
+    }),
+  ],
+  controllers: [AppController],
+  providers: [AppService],
+})
+export class AppModule {}
+```
+
+&NewLine;
+
+> Inject **KafkaPubSubService** into `your.service.ts`
+
+&NewLine;
+
+```typescript
+import { Injectable, Logger } from '@nestjs/common';
+import { KafkaPubSubService } from 'nestjs-pubsub';
+
+@Injectable()
+export class YourService {
+  constructor(private readonly kafkaService: KafkaPubSubService) {
+    this.kafkaService
+      .onEvent({ topics: ['test-topic'] })
+      .subscribe(({ value, attributes, headers }) => {
+        console.log('your data', value);
+
+        // Your handler code here ...
+      });
+  }
+
+  // Publish data
+  async publish(topic: string, data: unknown): Promise<any> {
+    return await this.kafkaService.publish(topic, data);
   }
 }
 ```

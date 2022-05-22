@@ -1,6 +1,6 @@
 {
   "name": "nest-pubsub",
-  "version": "1.0.8",
+  "version": "1.2.0",
   "description": "NestJS Publish/Subscribe",
   "author": "Mostafa Gholami <mostafagholamidev@gmail.com>",
   "license": "MIT",
@@ -26,7 +26,9 @@
     "redis",
     "publish",
     "subscribe",
-    "ioredis"
+    "ioredis",
+    "kafkajs",
+    "kafka"
   ],
   "publishConfig": {
     "access": "public"
@@ -41,6 +43,7 @@
   },
   "dependencies": {
     "ioredis": "^5.0.5",
+    "kafkajs": "^2.0.0",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.5.5"
   },
