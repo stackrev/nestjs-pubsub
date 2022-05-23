@@ -58,11 +58,11 @@ export class AppModule {}
 
 ```typescript
 import { Injectable, Logger } from '@nestjs/common';
-import { RedisService } from 'nestjs-pubsub';
+import { RedisPubSubService } from 'nestjs-pubsub';
 
 @Injectable()
 export class YourService {
-  constructor(private readonly redisService: RedisService) {
+  constructor(private readonly redisService: RedisPubSubService) {
     this.redisService.onEvent('your_event_name').subscribe(({ message }) => {
       console.log('income data as string', message);
       // Parse your data if you need!
