@@ -1,4 +1,4 @@
-## Nest Sockedis
+## Nest Pub/Sub
 
 > **`Nestjs`**, **`Publish`**, **`Subscribe`**, **`Redis`**, **`Kafka`**
 >
@@ -14,10 +14,10 @@
 
 ```bash
 # npm
-$ npm install --save nestjs-pubsub
+$ npm install --save nest-pubsub
 
 # yarn
-$ yarn add nestjs-pubsub
+$ yarn add nest-pubsub
 ```
 
 &NewLine;
