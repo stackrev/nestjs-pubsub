@@ -1,6 +1,17 @@
 import {
-    Consumer, ConsumerConfig, ConsumerSubscribeTopics, EachMessagePayload, Kafka, KafkaConfig,
-    KafkaMessage, Producer, ProducerConfig
+  Consumer,
+  ConsumerConfig,
+  ConsumerSubscribeTopics,
+  EachMessagePayload,
+  Kafka,
+  KafkaConfig,
+  KafkaMessage,
+  Producer,
+  ProducerBatch,
+  ProducerConfig,
+  ProducerRecord,
+  RecordMetadata,
+  CompressionTypes,
 } from 'kafkajs';
 import { Observable, Observer } from 'rxjs';
 
@@ -14,8 +25,8 @@ import { KafkaParser } from './kafka-pubsub.parser';
 
 @Injectable()
 export class KafkaPubSubService implements PubSubServiceInterface {
-  protected producer: Producer;
-  protected consumer: Consumer;
+  public producer: Producer;
+  public consumer: Consumer;
 
   constructor(
     @Inject(KAFKA_CLIENT)
@@ -53,8 +64,12 @@ export class KafkaPubSubService implements PubSubServiceInterface {
     return rawMessage;
   }
 
-  public async publish(topic: string, messages: any): Promise<any> {
-    await this.producer.send({ topic, messages });
+  public async publish(record: ProducerRecord): Promise<RecordMetadata[]> {
+    return await this.producer.send(record);
+  }
+
+  public async publishBatch(batch: ProducerBatch): Promise<RecordMetadata[]> {
+    return await this.producer.sendBatch(batch);
   }
 
   public createNewClient(config: KafkaConfig): Kafka {
@@ -65,13 +80,24 @@ export class KafkaPubSubService implements PubSubServiceInterface {
     return new KafkaParser(config);
   }
 
-  public createProducerConsumer(
-    producerConfig?: ProducerConfig,
+  public async bootstrap(
     consumerConfig?: ConsumerConfig,
+    producerConfig?: ProducerConfig,
+    recreate: boolean = false,
+  ): Promise<KafkaPubSubService> {
+    this.createConsumerProducer(consumerConfig, producerConfig, recreate);
+    await this.connect();
+
+    return this;
+  }
+
+  public createConsumerProducer(
+    consumerConfig?: ConsumerConfig,
+    producerConfig?: ProducerConfig,
     recreate: boolean = false,
   ): KafkaPubSubService {
-    this.getProducer(producerConfig, recreate);
     this.getConsumer(consumerConfig, recreate);
+    this.getProducer(producerConfig, recreate);
 
     return this;
   }
@@ -106,9 +132,11 @@ export class KafkaPubSubService implements PubSubServiceInterface {
     return this.consumer;
   }
 
-  public async connect(): Promise<void> {
-    await this.producer.connect();
-    await this.consumer.connect();
+  public async connect(): Promise<KafkaPubSubService> {
+    this.producer && (await this.producer.connect());
+    this.consumer && (await this.consumer.connect());
+
+    return this;
   }
 
   public async disconnect(): Promise<void> {
@@ -118,3 +146,19 @@ export class KafkaPubSubService implements PubSubServiceInterface {
     this.consumer = null;
   }
 }
+
+export {
+  Consumer,
+  ConsumerConfig,
+  ConsumerSubscribeTopics,
+  EachMessagePayload,
+  Kafka,
+  KafkaConfig,
+  KafkaMessage,
+  Producer,
+  ProducerBatch,
+  ProducerConfig,
+  ProducerRecord,
+  RecordMetadata,
+  CompressionTypes,
+};

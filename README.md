@@ -128,11 +128,20 @@ export class AppModule {}
 
 ```typescript
 import { Injectable, Logger } from '@nestjs/common';
-import { KafkaPubSubService } from 'nestjs-pubsub';
+import { KafkaPubSubService, ProducerRecord, RecordMetadata, ProducerBatch } from 'nestjs-pubsub';
 
 @Injectable()
 export class YourService {
   constructor(private readonly kafkaService: KafkaPubSubService) {
+    this.bootstrap()
+  }
+
+  async bootstrap() {
+    this.kafkaService.bootstrap(
+      { groupId: 'your-group-id', ... }, // ConsumerConfig, this is required
+      { ... } // ProducerConfig, this is optional
+    );
+
     this.kafkaService
       .onEvent({ topics: ['test-topic'] })
       .subscribe(({ value, attributes, headers }) => {
@@ -143,8 +152,52 @@ export class YourService {
   }
 
   // Publish data
-  async publish(topic: string, data: unknown): Promise<any> {
-    return await this.kafkaService.publish(topic, data);
+  async publish(record: ProducerRecord): Promise<RecordMetadata[]> {
+    return await this.kafkaService.publish(record);
+  }
+
+  // Publish batch data
+  async publishBatch(batch: ProducerBatch): Promise<RecordMetadata[]> {
+    return await this.kafkaService.publishBatch(batch);
+  }
+}
+```
+
+&NewLine;
+
+> Inject **KafkaAdminService** into `your.service.ts`
+
+&NewLine;
+
+```typescript
+import { Injectable, Logger } from '@nestjs/common';
+import { KafkaAdminService, AdminConfig, CreateTopicsOptions, DeleteTopicsOptions } from 'nestjs-pubsub';
+
+@Injectable()
+export class YourService {
+  constructor(private readonly kafkaAdminService: KafkaAdminService) {
+    this.bootstrap()
+  }
+
+  async bootstrap() {
+    await this.kafkaAdminService.bootstrap(
+      { ... } // AdminConfig, this is optional
+    );
+  }
+
+  // List topics
+  async listTopics(): Promise<string[]> {
+    return await this.kafkaAdminService.listTopics();
+  }
+
+  // Create topics
+  async createTopics(options: CreateTopicsOptions): Promise<boolean> {
+    return await this.kafkaAdminService.createTopics(options);
+  }
+
+   // Delete topics
+  async deleteTopics(options: DeleteTopicsOptions): Promise<void> {
+    return await this.kafkaAdminService.deleteTopics(options);
   }
 }
 ```

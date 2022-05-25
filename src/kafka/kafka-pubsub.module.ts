@@ -1,3 +1,4 @@
+import { KafkaAdminService } from './kafka-admin.service';
 import { Kafka, KafkaConfig } from 'kafkajs';
 
 import { DynamicModule, Global, Module } from '@nestjs/common';
@@ -30,6 +31,7 @@ export class KafkaPubSubModule {
         },
         KafkaParser,
         KafkaPubSubService,
+        KafkaAdminService,
       ],
       exports: [KafkaParser, KafkaPubSubService],
     };
