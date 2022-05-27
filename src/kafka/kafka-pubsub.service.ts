@@ -16,10 +16,8 @@ import {
 import { Observable, Observer } from 'rxjs';
 
 import { Inject, Injectable } from '@nestjs/common';
-import { isUndefined } from '@nestjs/common/utils/shared.utils';
 
 import { KafkaParserConfig, PubSubServiceInterface } from '../contracts';
-import { KafkaHeaders } from './kafka-headers.enum';
 import { KAFKA_CLIENT, KAFKA_PAYLOAD_PARSER } from './kafka-pubsub.constants';
 import { KafkaParser } from './kafka-pubsub.parser';
 
@@ -56,10 +54,6 @@ export class KafkaPubSubService implements PubSubServiceInterface {
         partition: payload.partition,
       }),
     );
-
-    if (isUndefined(rawMessage.headers[KafkaHeaders.CORRELATION_ID])) {
-      return;
-    }
 
     return rawMessage;
   }
