@@ -128,27 +128,28 @@ export class AppModule {}
 
 ```typescript
 import { Injectable, Logger } from '@nestjs/common';
-import { KafkaPubSubService, ProducerRecord, RecordMetadata, ProducerBatch } from 'nestjs-pubsub';
+import {
+  KafkaPubSubService,
+  ProducerRecord,
+  RecordMetadata,
+  ProducerBatch,
+} from 'nestjs-pubsub';
 
 @Injectable()
 export class YourService {
   constructor(private readonly kafkaService: KafkaPubSubService) {
-    this.bootstrap()
+    this.bootstrap();
   }
 
   async bootstrap() {
-    this.kafkaService.bootstrap(
-      { groupId: 'your-group-id', ... }, // ConsumerConfig, this is required
-      { ... } // ProducerConfig, this is optional
-    );
+    const kafka = await this.kafkaService.bootstrap({ groupId: 'group-id' });
+    const observable = await kafka.onEvent({ topics: ['test-topic'] });
 
-    this.kafkaService
-      .onEvent({ topics: ['test-topic'] })
-      .subscribe(({ value, attributes, headers }) => {
-        console.log('your data', value);
+    observable.subscribe(({ value }) => {
+      console.log('your data', value);
 
-        // Your handler code here ...
-      });
+      // Your handler code here ...
+    });
   }
 
   // Publish data
