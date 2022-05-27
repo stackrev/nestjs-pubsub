@@ -5,10 +5,11 @@ import { KafkaParserConfig } from '../contracts';
 
 @Injectable()
 export class KafkaParser {
-  protected readonly keepBinary: boolean;
+  protected keepBinary: boolean;
 
-  constructor(config?: KafkaParserConfig) {
-    this.keepBinary = (config && config.keepBinary) || false;
+  public config(cnf?: KafkaParserConfig) {
+    this.keepBinary = (cnf && cnf.keepBinary) || false;
+    return this;
   }
 
   public parse<T = any>(data: any): T {

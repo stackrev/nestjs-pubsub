@@ -77,13 +77,14 @@ export class KafkaPubSubService implements PubSubServiceInterface {
   }
 
   public createNewParser(config?: KafkaParserConfig): KafkaParser {
-    return new KafkaParser(config);
+    const prs = new KafkaParser();
+    return prs.config(config);
   }
 
   public async bootstrap(
     consumerConfig?: ConsumerConfig,
     producerConfig?: ProducerConfig,
-    recreate: boolean = false,
+    recreate = false,
   ): Promise<KafkaPubSubService> {
     this.createConsumerProducer(consumerConfig, producerConfig, recreate);
     await this.connect();
@@ -94,7 +95,7 @@ export class KafkaPubSubService implements PubSubServiceInterface {
   public createConsumerProducer(
     consumerConfig?: ConsumerConfig,
     producerConfig?: ProducerConfig,
-    recreate: boolean = false,
+    recreate = false,
   ): KafkaPubSubService {
     this.getConsumer(consumerConfig, recreate);
     this.getProducer(producerConfig, recreate);
@@ -102,10 +103,7 @@ export class KafkaPubSubService implements PubSubServiceInterface {
     return this;
   }
 
-  public getProducer(
-    config?: ProducerConfig,
-    recreate: boolean = false,
-  ): Producer {
+  public getProducer(config?: ProducerConfig, recreate = false): Producer {
     if (!this.client) {
       throw new Error('Kafka client not created');
     }
@@ -117,10 +115,7 @@ export class KafkaPubSubService implements PubSubServiceInterface {
     return this.producer;
   }
 
-  public getConsumer(
-    config: ConsumerConfig,
-    recreate: boolean = false,
-  ): Consumer {
+  public getConsumer(config: ConsumerConfig, recreate = false): Consumer {
     if (!this.client) {
       throw new Error('Kafka instance not created');
     }

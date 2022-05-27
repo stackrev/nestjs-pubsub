@@ -1,6 +1,6 @@
 {
   "name": "nest-pubsub",
-  "version": "1.3.2",
+  "version": "1.3.3",
   "description": "NestJS Publish/Subscribe",
   "author": "Mostafa Gholami <mostafagholamidev@gmail.com>",
   "license": "MIT",
